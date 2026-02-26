@@ -1,0 +1,90 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h1>{% if book %}Редактирование книги{% else %}Добавление книги{% endif %}</h1>
+
+<form method="post" enctype="multipart/form-data" class="row g-3">
+    {% if book %}
+    <input type="hidden" name="_token" value="{{ csrf_token('edit' ~ book.id) }}">
+    <div class="col-md-4">
+        <label class="form-label">Текущая обложка</label>
+        <div class="border rounded p-2 text-center" style="min-height: 200px;">
+            {% if book.imageName %}
+                <img src="/uploads/books_covers/{{ book.imageName }}" alt="Обложка" style="max-height: 180px; object-fit: contain;">
+            {% else %}
+                <div class="text-muted d-flex align-items-center justify-content-center h-100">
+                    <span>Нет обложки</span>
+                </div>
+            {% endif %}
+        </div>
+        {% if book.imageName %}
+            <div class="mt-2">
+                <a href="{{ path('book_delete_cover', {id: book.id}) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Удалить обложку?');">Удалить обложку</a>
+            </div>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    <div class="{% if book %}col-md-8{% else %}col-12{% endif %}">
+        <div class="col-12">
+            <label for="cover" class="form-label">Обложка</label>
+            <input type="file" class="form-control" id="cover" name="cover" accept="image/*">
+        </div>
+        
+        <div class="col-12 mt-3">
+            <label for="title" class="form-label">Название</label>
+            <input type="text" class="form-control" id="title" name="title" value="{{ book.title|default('') }}" required>
+        </div>
+        
+        <div class="col-12 mt-3">
+            <label for="author" class="form-label">Автор</label>
+            <select class="form-select select2" id="author" name="author">
+                <option value="">-- Выберите автора --</option>
+                {% for author in authors %}
+                    <option value="{{ author.id }}" {% if (book and book.author and book.author.id == author.id) or (selectedAuthorId is defined and selectedAuthorId == author.id) %}selected{% endif %}>
+                        {{ author.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <label for="year" class="form-label">Год издания</label>
+                <input type="number" class="form-control" id="year" name="year" value="{{ book.year|default('') }}">
+            </div>
+            
+            <div class="col-md-6">
+                <label for="isbn" class="form-label">ISBN</label>
+                <input type="text" class="form-control" id="isbn" name="isbn" value="{{ book.isbn|default('') }}">
+            </div>
+        </div>
+        
+        <div class="col-12 mt-3">
+            <label for="description" class="form-label">Описание</label>
+            <textarea class="form-control" id="description" name="description" rows="5">{{ book.description|default('') }}</textarea>
+        </div>
+    </div>
+    
+    <div class="col-12 mt-3">
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+        {% if book %}
+            <a href="{{ path('book_show', {id: book.id}) }}" class="btn btn-outline-secondary">Отмена</a>
+        {% else %}
+            <a href="{{ path('book_index') }}" class="btn btn-outline-secondary">Отмена</a>
+        {% endif %}
+    </div>
+</form>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+$(document).ready(function() {
+    $('.select2').select2({
+        language: 'ru',
+        placeholder: 'Выберите автора',
+        allowClear: true
+    });
+});
+</script>
+{% endblock %}

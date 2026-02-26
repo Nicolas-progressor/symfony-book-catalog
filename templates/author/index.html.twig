@@ -1,0 +1,83 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Каталог авторов</h1>
+    {% if is_granted('ROLE_ADMIN') %}
+        <a href="{{ path('author_new') }}" class="btn btn-primary">Добавить автора</a>
+    {% endif %}
+</div>
+
+{% if authors is empty %}
+    <div class="alert alert-info">Авторов пока нет</div>
+{% else %}
+    <div id="authors-container" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% include 'author/_list.html.twig' %}
+    </div>
+    
+    <div id="loading-authors">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Загрузка...</span>
+        </div>
+    </div>
+    
+    <input type="hidden" id="current-page" value="{{ page }}">
+    <input type="hidden" id="total-pages" value="{{ totalPages }}">
+{% endif %}
+
+{% block javascripts %}
+<script>
+$(document).ready(function() {
+    let currentPage = parseInt($('#current-page').val());
+    const totalPages = parseInt($('#total-pages').val());
+    let isLoading = false;
+    
+    $(window).on('scroll', function() {
+        if (isLoading || currentPage >= totalPages) return;
+        
+        const scrollPosition = $(window).innerHeight() + $(window).scrollTop();
+        const documentHeight = $(document).height();
+        
+        if (scrollPosition >= documentHeight - 500) {
+            loadMore();
+        }
+    });
+    
+    function loadMore() {
+        isLoading = true;
+        $('#loading-authors').show();
+        
+        currentPage++;
+        
+        $.get(`/author/load-more?page=${currentPage}`, function(html) {
+            $('#authors-container').append(html);
+            $('#loading-authors').hide();
+            isLoading = false;
+            
+            if (currentPage >= totalPages) {
+                $('#loading-authors').hide();
+            }
+        }).fail(function() {
+            isLoading = false;
+            $('#loading-authors').hide();
+        });
+    }
+    
+    // Загрузка книг автора в списке
+    $(document).on('click', '.load-more-author-books', function() {
+        const btn = $(this);
+        const authorId = btn.data('author-id');
+        const container = btn.closest('.author-books');
+        const currentLimit = parseInt(container.data('limit')) || 3;
+        const newLimit = currentLimit + 3;
+        
+        container.data('limit', newLimit);
+        
+        $.get(`/author/${authorId}/books-preview?limit=${newLimit}`, function(html) {
+            container.html(html);
+        });
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}

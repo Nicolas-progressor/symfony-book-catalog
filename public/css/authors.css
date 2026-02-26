@@ -1,0 +1,11 @@
+/* Стили для авторов */
+.author-books .book-preview-img {
+    width: 40px;
+    height: 50px;
+    object-fit: contain;
+}
+
+.author-books .book-preview-placeholder {
+    width: 40px;
+    height: 50px;
+}

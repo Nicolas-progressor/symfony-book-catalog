@@ -1,0 +1,60 @@
+security:
+    # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+
+    # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
+    providers:
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: email
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        main:
+            lazy: true
+            provider: app_user_provider
+            form_login:
+                login_path: app_login
+                check_path: app_login
+            logout:
+                path: app_logout
+                target: app_home
+
+            # activate different ways to authenticate
+            # https://symfony.com/doc/current/security.html#the-firewall
+
+            # https://symfony.com/doc/current/security/impersonating_user.html
+            # switch_user: true
+
+    # Easy way to control access for large sections of your site
+    # Note: Only the *first* access control that matches will be used
+    access_control:
+        - { path: ^/profile, roles: ROLE_USER }
+
+when@prod:
+    security:
+        # https://symfony.com/doc/current/security/force_https.html
+        # https://symfony.com/doc/current/reference/configuration/security.html#force-https
+        # https://symfony.com/doc/current/security.html#trusted-proxies-and-headers
+        # by default, the URL generator uses $_SERVER['HTTPS'] to determine
+        # if the "https" schema should be used or not
+        # this option allows to override this behaviour
+        # if your application is running behind a reverse proxy, you might
+        # need to set this value to "true"
+        # trusted_proxies: ['127.0.0.1', '127.0.0.2']
+        # if your reverse proxy uses a non-standard header to specify whether
+        # HTTPS is used or not, you can configure it with the trusted_header_type
+        # option. Set it to null to not trust any header
+        # trusted_header_type: 'x-forwardedproto'
+        # https://symfony.com/doc/current/security.html#csp
+        # content_security_policy:
+        #     upgrade-insecure-requests: 'self'
+        #     default-src: [ 'self' ]
+        #     script-src: [ 'self' ]
+        #     style-src: [ 'self', 'unsafe-inline' ]
+        #     img-src: [ 'self', 'data:', 'https://i.ytimg.com' ]
+        #     font-src: [ 'self', 'data:' ]
+        #     child-src: [ 'self', 'https://www.youtube.com' ]

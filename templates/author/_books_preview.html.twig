@@ -1,0 +1,21 @@
+{% for book in books %}
+<div class="d-flex align-items-center mb-2">
+    {% if book.imageName %}
+        <img src="{{ book.imageLink ?: '/uploads/books_covers/' ~ book.imageName }}" class="img-thumbnail me-2" alt="{{ book.title }}" style="width: 40px; height: 50px; object-fit: contain;">
+    {% elseif book.imageLink %}
+        <img src="{{ book.imageLink }}" class="img-thumbnail me-2" alt="{{ book.title }}" style="width: 40px; height: 50px; object-fit: contain;">
+    {% else %}
+        <div class="bg-light text-dark d-flex align-items-center justify-content-center me-2 rounded" style="width: 40px; height: 50px;">
+            <small>Нет</small>
+        </div>
+    {% endif %}
+    <a href="{{ path('book_show', {id: book.id}) }}" class="text-decoration-none small">{{ book.title }}</a>
+</div>
+{% endfor %}
+{% if limit < totalBooks %}
+<div class="text-center mt-2">
+    <button class="btn btn-sm btn-outline-secondary load-more-author-books" data-author-id="{{ authorId }}">
+        <i class="bi bi-chevron-down"></i> Ещё {{ totalBooks - limit }}
+    </button>
+</div>
+{% endif %}

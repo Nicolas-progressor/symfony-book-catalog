@@ -1,0 +1,100 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="row">
+    <div class="col-12 text-center mb-5">
+        <h1 class="display-4"><i class="bi bi-book"></i> Каталог книг</h1>
+        <p class="lead">Управление библиотечной коллекцией с подписками на авторов</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body">
+                <h2 class="card-title">О проекте</h2>
+                <p class="card-text">
+                    Современное веб-приложение для управления каталогом книг и авторов, разработанное на Symfony 6.4.
+                    Платформа позволяет просматривать, добавлять, редактировать и удалять книги и авторов,
+                    а также подписываться на любимых авторов и получать уведомления о новых книгах.
+                </p>
+            </div>
+        </div>
+
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body">
+                <h2 class="card-title">Возможности</h2>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-book me-2"></i>Каталог книг</span>
+                        <small class="text-muted">Просмотр с автоподгрузкой</small>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-person me-2"></i>Каталог авторов</span>
+                        <small class="text-muted">Список авторов с книгами</small>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-bell me-2"></i>Подписки на авторов</span>
+                        <small class="text-muted">Уведомления о новых книгах</small>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-person-plus me-2"></i>Регистрация и вход</span>
+                        <small class="text-muted">Создание аккаунта пользователя</small>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-pencil me-2"></i>Управление (для админов)</span>
+                        <small class="text-muted">CRUD операции для книг и авторов</small>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-image me-2"></i>Обложки книг</span>
+                        <small class="text-muted">Загрузка и управление изображениями</small>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-bell-fill me-2"></i>Уведомления</span>
+                        <small class="text-muted">Персональные оповещения</small>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h2 class="card-title">Технологии</h2>
+                <div class="row text-center mt-3">
+                    <div class="col-md-4">
+                        <div class="badge bg-dark p-3 mb-2 d-block">Symfony 6.4</div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="badge bg-secondary p-3 mb-2 d-block">Twig</div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="badge bg-primary p-3 mb-2 d-block">SQLite</div>
+                    </div>
+                </div>
+                <div class="row text-center mt-2">
+                    <div class="col-md-4">
+                        <div class="badge bg-info p-3 mb-2 d-block">jQuery</div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="badge bg-warning text-dark p-3 mb-2 d-block">Bootstrap 5</div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="badge bg-success p-3 mb-2 d-block">Doctrine ORM</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-12 text-center">
+        <a href="{{ path('book_index') }}" class="btn btn-lg btn-primary me-3">
+            <i class="bi bi-journal-text"></i> Перейти к книгам
+        </a>
+        <a href="{{ path('author_index') }}" class="btn btn-lg btn-outline-secondary">
+            <i class="bi bi-people"></i> Список авторов
+        </a>
+    </div>
+</div>
+{% endblock %}

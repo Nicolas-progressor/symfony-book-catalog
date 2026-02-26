@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  php:
+    image: php:8.4-fpm
+    container_name: symfony_php
+    working_dir: /var/www/symfony
+    volumes:
+      - .:/var/www/symfony
+    environment:
+      - PHP_IDE_CONFIG=serverName=symfony.local
+    networks:
+      - symfony_network
+
+  nginx:
+    image: nginx:alpine
+    container_name: symfony_nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/symfony
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+    depends_on:
+      - php
+    networks:
+      - symfony_network
+
+  database:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+    ports:
+      - "5432:5432"
+    volumes:
+      - database_data:/var/lib/postgresql/data
+    networks:
+      - symfony_network
+
+networks:
+  symfony_network:
+    driver: bridge
+
+volumes:
+  database_data:

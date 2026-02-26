@@ -1,0 +1,129 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="d-flex justify-content-between align-items-start">
+    <h1>{{ author.name }}</h1>
+    <div>
+        {% if is_granted('ROLE_USER') and not is_granted('ROLE_ADMIN') %}
+            {% if isSubscribed %}
+                <form method="post" action="{{ path('author_unsubscribe', {id: author.id}) }}" class="d-inline">
+                    <input type="hidden" name="_token" value="{{ csrf_token('unsubscribe' ~ author.id) }}">
+                    <button type="submit" class="btn btn-sm btn-outline-secondary">Отписаться</button>
+                </form>
+            {% else %}
+                <form method="post" action="{{ path('author_subscribe', {id: author.id}) }}" class="d-inline">
+                    <input type="hidden" name="_token" value="{{ csrf_token('subscribe' ~ author.id) }}">
+                    <button type="submit" class="btn btn-sm btn-outline-primary">Подписаться</button>
+                </form>
+            {% endif %}
+        {% endif %}
+        {% if is_granted('ROLE_ADMIN') %}
+            <div class="btn-group" role="group">
+                <a href="{{ path('author_edit', {id: author.id}) }}" class="btn btn-sm btn-outline-primary">Редактировать</a>
+                <form method="post" action="{{ path('author_delete', {id: author.id}) }}" class="d-inline" onsubmit="return confirm('Удалить автора и все его книги?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ author.id) }}">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Удалить</button>
+                </form>
+            </div>
+        {% endif %}
+    </div>
+</div>
+<p class="text-muted">{{ author.lifespan }}</p>
+    
+{% if author.biography %}
+    <hr>
+    <h4>Биография</h4>
+    <p>{{ author.biography }}</p>
+{% endif %}
+
+<hr>
+<div class="d-flex justify-content-between align-items-center">
+    <h4>Книги автора ({{ totalBooks }})</h4>
+    {% if is_granted('ROLE_ADMIN') %}
+        <a href="{{ path('book_new_with_author', {authorId: author.id}) }}" class="btn btn-sm btn-primary">Добавить книгу</a>
+    {% endif %}
+</div>
+
+{% if books is empty %}
+    <p>Нет книг</p>
+{% else %}
+    <div id="books-container" class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-3">
+        {% for book in books %}
+            <div class="col">
+                <div class="card book-card h-100">
+                    {% if book.imageName %}
+                        <img src="{{ book.imageLink ?: '/uploads/books_covers/' ~ book.imageName }}" class="card-img-top" alt="{{ book.title }}">
+                    {% elseif book.imageLink %}
+                        <img src="{{ book.imageLink }}" class="card-img-top" alt="{{ book.title }}">
+                    {% else %}
+                        <div class="bg-light text-dark d-flex align-items-center justify-content-center" style="height: 250px;">
+                            <span>Нет обложки</span>
+                        </div>
+                    {% endif %}
+                    <div class="card-body">
+                        <h6 class="card-title">{{ book.title }}</h6>
+                        <p class="card-text">
+                            <small class="text-muted">{{ book.year }}</small>
+                        </p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="{{ path('book_show', {id: book.id}) }}" class="btn btn-sm btn-outline-primary w-100">Подробнее</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    
+    {% if hasMore %}
+    <div class="text-center mt-3">
+        <button id="load-more-books" class="btn btn-outline-primary">Показать ещё</button>
+    </div>
+    {% endif %}
+    
+    <div id="loading-books">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Загрузка...</span>
+        </div>
+    </div>
+{% endif %}
+
+<a href="{{ path('author_index') }}" class="btn btn-outline-secondary mt-4">Назад к списку</a>
+
+{% if hasMore %}
+{% block javascripts %}
+<script>
+$(document).ready(function() {
+    let currentLimit = {{ limit }};
+    const totalBooks = {{ totalBooks }};
+    let isLoading = false;
+    
+    $('#load-more-books').on('click', function() {
+        if (isLoading) return;
+        
+        isLoading = true;
+        $('#loading-books').show();
+        $(this).hide();
+        
+        currentLimit += 20;
+        
+        $.get(`/author/{{ author.id }}/books-more?limit=${currentLimit}`, function(html) {
+            $('#books-container').html(html);
+            $('#loading-books').hide();
+            isLoading = false;
+            
+            if (currentLimit >= totalBooks) {
+                $('#load-more-books').hide();
+            } else {
+                $('#load-more-books').show();
+            }
+        }).fail(function() {
+            isLoading = false;
+            $('#loading-books').hide();
+            $('#load-more-books').show();
+        });
+    });
+});
+</script>
+{% endblock %}
+{% endif %}
+{% endblock %}

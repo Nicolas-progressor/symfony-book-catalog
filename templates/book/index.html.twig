@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Каталог книг</h1>
+    {% if is_granted('ROLE_ADMIN') %}
+        <a href="{{ path('book_new') }}" class="btn btn-primary">Добавить книгу</a>
+    {% endif %}
+</div>
+
+{% if books is empty %}
+    <div class="alert alert-info">Книг пока нет</div>
+{% else %}
+    <div id="books-container" class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-3">
+        {% include 'book/_list.html.twig' %}
+    </div>
+    
+    <div id="loading">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Загрузка...</span>
+        </div>
+    </div>
+    
+    <input type="hidden" id="current-page" value="{{ page }}">
+    <input type="hidden" id="total-pages" value="{{ totalPages }}">
+{% endif %}
+
+{% block javascripts %}
+<script>
+    let currentPage = parseInt($('#current-page').val());
+    const totalPages = parseInt($('#total-pages').val());
+    let isLoading = false;
+    
+    $(window).on('scroll', function() {
+        if (isLoading || currentPage >= totalPages) return;
+        
+        const scrollPosition = $(window).innerHeight() + $(window).scrollTop();
+        const documentHeight = $(document).height();
+        
+        if (scrollPosition >= documentHeight - 500) {
+            loadMore();
+        }
+    });
+    
+    function loadMore() {
+        isLoading = true;
+        $('#loading').show();
+        
+        currentPage++;
+        
+        $.get(`/book/load-more?page=${currentPage}`, function(html) {
+            $('#books-container').append(html);
+            $('#loading').hide();
+            isLoading = false;
+            
+            if (currentPage >= totalPages) {
+                $('#loading').hide();
+            }
+        }).fail(function() {
+            isLoading = false;
+            $('#loading').hide();
+        });
+    }
+</script>
+{% endblock %}
+{% endblock %}

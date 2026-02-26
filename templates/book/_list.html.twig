@@ -1,0 +1,29 @@
+{% for book in books %}
+<div class="col">
+    <div class="card book-card h-100">
+        {% if book.imageName %}
+            <img src="{{ book.imageLink ?: '/uploads/books_covers/' ~ book.imageName }}" class="card-img-top" alt="{{ book.title }}">
+        {% elseif book.imageLink %}
+            <img src="{{ book.imageLink }}" class="card-img-top" alt="{{ book.title }}">
+        {% else %}
+            <div class="bg-light text-dark d-flex align-items-center justify-content-center" style="height: 250px;">
+                <span>Нет обложки</span>
+            </div>
+        {% endif %}
+        <div class="card-body">
+            <h6 class="card-title">{{ book.title }}</h6>
+            <p class="card-text">
+                <small class="text-muted">
+                    {% if book.author %}
+                        <a href="{{ path('author_show', {id: book.author.id}) }}">{{ book.author.name }}</a>
+                    {% endif %}
+                    {% if book.year %}, {{ book.year }}{% endif %}
+                </small>
+            </p>
+        </div>
+        <div class="card-footer">
+            <a href="{{ path('book_show', {id: book.id}) }}" class="btn btn-sm btn-outline-primary w-100">Подробнее</a>
+        </div>
+    </div>
+</div>
+{% endfor %}
