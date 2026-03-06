@@ -48,3 +48,6 @@ docker-compose.override.yml
 
 # Composer
 /composer.phar
+
+# Documentation
+/docs/

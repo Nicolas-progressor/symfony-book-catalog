@@ -7,7 +7,14 @@
     <div class="alert alert-success">{{ flash_success }}</div>
 {% endfor %}
 
+{% for flash_danger in app.flashes('danger') %}
+    <div class="alert alert-danger">{{ flash_danger }}</div>
+{% endfor %}
+
 <div class="card mt-4">
+    <div class="card-header">
+        <h5 class="mb-0">Основная информация</h5>
+    </div>
     <div class="card-body">
         {{ form_start(form, {'attr': {'class': 'row g-3'}}) }}
             <div class="col-md-6">
@@ -37,6 +44,34 @@
                 </p>
             </div>
         </div>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header bg-warning bg-opacity-25">
+        <h5 class="mb-0">Смена пароля</h5>
+    </div>
+    <div class="card-body">
+        {{ form_start(passwordForm, {'attr': {'class': 'row g-3'}}) }}
+            <div class="col-12">
+                {{ form_label(passwordForm.current_password) }}
+                {{ form_widget(passwordForm.current_password, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(passwordForm.current_password) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_label(passwordForm.new_password.first) }}
+                {{ form_widget(passwordForm.new_password.first, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(passwordForm.new_password.first) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_label(passwordForm.new_password.second) }}
+                {{ form_widget(passwordForm.new_password.second, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(passwordForm.new_password.second) }}
+            </div>
+            <div class="col-12">
+                {{ form_widget(passwordForm.change_password, {'attr': {'class': 'btn btn-warning'}}) }}
+            </div>
+        {{ form_end(passwordForm) }}
     </div>
 </div>
 {% endblock %}
