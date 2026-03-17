@@ -29,10 +29,14 @@ class ProfileController extends AbstractController
         $user = $this->getUser();
         
         $form = $formFactory->createBuilder()
-            ->add('username', TextType::class, ['label' => 'Имя пользователя', 'data' => $user->getUsername(), 'required' => true])
-            ->add('email', EmailType::class, ['label' => 'Email', 'data' => $user->getEmail(), 'required' => true])
+            ->add('username', TextType::class, ['label' => 'Имя пользователя', 'required' => true])
+            ->add('email', EmailType::class, ['label' => 'Email', 'required' => true])
             ->add('save', SubmitType::class, ['label' => 'Сохранить', 'attr' => ['class' => 'btn-primary']])
             ->getForm();
+
+        // Устанавливаем данные из сущности user
+        $form->get('username')->setData($user->getUsername());
+        $form->get('email')->setData($user->getEmail());
 
         // Форма смены пароля
         $passwordForm = $formFactory->createBuilder()
@@ -48,28 +52,38 @@ class ProfileController extends AbstractController
 
         $passwordForm->handleRequest($request);
 
-        if ($passwordForm->isSubmitted()) {
-            if ($passwordForm->isValid()) {
-                $currentPassword = $passwordForm->get('current_password')->getData();
-                $newPassword = $passwordForm->get('new_password')->getData();
-                
-                if (!$passwordHasher->isPasswordValid($user, $currentPassword)) {
-                    $this->addFlash('danger', 'Неверный текущий пароль');
-                } else {
-                    $hashedPassword = $passwordHasher->hashPassword($user, $newPassword);
-                    $user->setPassword($hashedPassword);
-                    $em->flush();
-                    $this->addFlash('success', 'Пароль успешно изменён');
-                    return $this->redirectToRoute('app_profile');
-                }
+        // Проверяем, была ли нажата кнопка смены пароля
+        $changePasswordClicked = $passwordForm->get('change_password')->isClicked();
+
+        if ($changePasswordClicked && $passwordForm->isSubmitted() && $passwordForm->isValid()) {
+            $currentPassword = $passwordForm->get('current_password')->getData();
+            $newPassword = $passwordForm->get('new_password')->getData();
+
+            if (empty($currentPassword)) {
+                $this->addFlash('danger', 'Введите текущий пароль');
+            } elseif (empty($newPassword)) {
+                $this->addFlash('danger', 'Введите новый пароль');
+            } elseif (!$passwordHasher->isPasswordValid($user, $currentPassword)) {
+                $this->addFlash('danger', 'Неверный текущий пароль');
             } else {
-                $this->addFlash('danger', 'Пароли не совпадают или заполнены некорректно');
+                $hashedPassword = $passwordHasher->hashPassword($user, $newPassword);
+                $user->setPassword($hashedPassword);
+                $em->flush();
+                $this->addFlash('success', 'Пароль успешно изменён');
+                return $this->redirectToRoute('app_profile');
             }
+        } elseif ($changePasswordClicked && $passwordForm->isSubmitted()) {
+            $this->addFlash('danger', 'Пароли не совпадают или заполнены некорректно');
         }
 
-        $form->handleRequest($request);
+        // Обрабатываем форму профиля только если нажата кнопка сохранения
+        $saveClicked = $form->get('save')->isClicked();
 
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($saveClicked) {
+            $form->handleRequest($request);
+        }
+
+        if ($saveClicked && $form->isSubmitted() && $form->isValid()) {
             $username = $form->get('username')->getData();
             $email = $form->get('email')->getData();
             
