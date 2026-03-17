@@ -18,7 +18,7 @@ services:
     image: nginx:alpine
     container_name: symfony_nginx
     ports:
-      - "8080:80"
+      - "8081:80"
     volumes:
       - .:/var/www/symfony
       - ./docker/nginx/conf.d:/etc/nginx/conf.d
@@ -34,7 +34,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
       POSTGRES_USER: ${POSTGRES_USER:-app}
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - database_data:/var/lib/postgresql/data
     networks:
