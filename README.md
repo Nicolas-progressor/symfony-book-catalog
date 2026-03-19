@@ -25,7 +25,7 @@
 
 - PHP 8.4
 - Composer
-- SQLite (или PostgreSQL для продакшена)
+- PostgreSQL
 
 ### Шаги установки
 
